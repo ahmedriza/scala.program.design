@@ -1,13 +1,15 @@
 
-abstract class JSON
 
-case class JSeq (elems: List[JSON])           extends JSON
-case class JObj (bindings: Map[String, JSON]) extends JSON
-case class JNum (num: Double)                 extends JSON
-case class JStr (str: String)                 extends JSON
-case class JBool (b: Boolean)                 extends JSON
-case object JNull                             extends JSON
+abstract class Json
 
+case class JSeq (elems: List[Json])           extends Json
+case class JObj (bindings: Map[String, Json]) extends Json
+case class JNum (num: Double)                 extends Json
+case class JStr (str: String)                 extends Json
+case class JBool (b: Boolean)                 extends Json
+case object JNull                             extends Json
+
+class Animal
 
 object Json {
 
@@ -30,7 +32,26 @@ object Json {
       )
     )
 
-    println(json)
+    val str = show(JSeq(List(
+      JObj(Map("type" -> JStr("home"), "number" -> JStr("212 555-1234"))),
+      JObj(Map("type" -> JStr("fax"), "number" -> JStr("646 555-4567")))
+    )))
 
+    println(show(json))
   }
+
+  def show(json: Json): String = json match {
+    case JSeq(elems) =>
+      "[" + elems.map(show).mkString(", ") + "]"
+    case JObj(bindings) =>
+      "{" +
+        bindings.map { case (key, value) => '\"' + key + "\": " + show(value) }.mkString(", ")  +
+        "}"
+    case JNum(num) => num.toString
+    case JStr(str) => '\"' + str + '\"'
+    case JBool(b) => b.toString
+    case JNull => "null"
+  }
+
+
 }
