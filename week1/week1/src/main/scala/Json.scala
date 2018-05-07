@@ -15,26 +15,21 @@ object Json {
 
   def main(args: Array[String]): Unit = {
 
-    val json = JObj(
-      Map(
-        "firstName" -> JStr("John"),
-        "lastName" -> JStr("Smith"),
-        "address" -> JObj(
-          Map(
-            "streeAddress" -> JStr("21 2nd Street"),
-            "state" -> JStr("NY"),
-            "postalCode" -> JNum(10021))),
-        "phoneNumbers" -> JSeq(List(
-          JObj(Map("type" -> JStr("home"), "number" -> JStr("212 555-1234"))),
-          JObj(Map("type" -> JStr("fax"), "number" -> JStr("646 555-4567")))))))
-
-    val str = show(JSeq(List(
-      JObj(Map("type" -> JStr("home"), "number" -> JStr("212 555-1234"))),
-      JObj(Map("type" -> JStr("fax"), "number" -> JStr("646 555-4567"))))))
-
-    println(show(json))
-    caseFunctions()
+    println(show(toJson))
   }
+
+  def toJson: Json = JObj(
+    Map(
+      "firstName" -> JStr("John"),
+      "lastName" -> JStr("Smith"),
+      "address" -> JObj(
+        Map(
+          "streeAddress" -> JStr("21 2nd Street"),
+          "state" -> JStr("NY"),
+          "postalCode" -> JNum(10021))),
+      "phoneNumbers" -> JSeq(List(
+        JObj(Map("type" -> JStr("home"), "number" -> JStr("212 555-1234"))),
+        JObj(Map("type" -> JStr("fax"), "number" -> JStr("646 555-4567")))))))
 
   type JBinding = (String, Json)
 
@@ -51,26 +46,5 @@ object Json {
     case JNull => "null"
   }
 
-  def caseFunctions(): Unit = {
-
-    val f: PartialFunction[String, String] = {
-      case "ping" => "pong"
-    }
-
-    val g: PartialFunction[List[Int], String] = {
-      case Nil => "one"
-      case x :: rest =>
-        rest match {
-          case Nil => "two"
-        }
-    }
-
-    println(f("ping"))
-
-    println(f.isDefinedAt("ping"))
-    println(f.isDefinedAt("pong"))
-
-    println(g.isDefinedAt(List(1,2,3)))
-  }
 
 }
