@@ -68,7 +68,7 @@ object RandomGenerators {
 
   val integers_ : Generator[Int] = new Generator[Int] {
     val rand = new java.util.Random()
-    override def generate: Int = rand.nextInt(Integer.MAX_VALUE)
+    override def generate: Int = rand.nextInt()
   }
 
   // Now we can write
@@ -109,14 +109,10 @@ object RandomGenerators {
   def choose(lo: Int, hi: Int): Generator[Int] = {
     integers_.map {
       x =>
-        val value = lo + x % (hi - lo)
+        val value = if (x < 0) lo + (-x) % (hi - lo) else lo + x % (hi - lo)
         value
     }
-    /*
-    for {
-      x <- integers_
-    } yield lo + x % (hi - lo)
-    */
+    // for (x <- integers_) yield lo + x % (hi - lo)
   }
 
   /**
@@ -132,9 +128,59 @@ object RandomGenerators {
   //
   // With these building blocks, how would we generate a random list?
 
-  def lists: Generator[List[Int]] = ???
+  /**
+    * @return an empty list or a non-empty list
+    */
+  def lists: Generator[List[Int]] = for {
+    isEmpty <- booleans_
+    list <- if (isEmpty) emptyLists else nonEmptyLists
+  } yield list
 
+  def emptyLists: Generator[List[Int]] = single(Nil)
 
+  def nonEmptyLists: Generator[List[Int]] = for {
+    head <- integers_
+    tail <- lists
+  } yield head :: tail
+
+  //
+  // Exercise
+  // Can you implement a generator that creates random Tree objects?
+  // Hint: a tree is either a leaf or an inner node.
+
+  trait Tree
+
+  case class Inner(left: Tree, right: Tree) extends  Tree
+
+  case class Leaf(x: Int) extends Tree
+
+  def leafNode: Generator[Tree] = for {
+    x <- integers_
+  } yield Leaf(x)
+
+  def innerNode: Generator[Tree] = for {
+    left <- trees
+    right <- trees
+  } yield Inner(left, right)
+
+  def trees: Generator[Tree] = for {
+    isLeaf <- booleans_
+    tree <- if (isLeaf) leafNode else innerNode
+  } yield tree
+
+  // ------------------------------------------------------------------------------------------------------------------
+
+  // Random Test Function
+
+  def test[T](g: Generator[T], numTimes: Int = 100)(test: T => Boolean): Unit = {
+    for (i <- 0 until numTimes) {
+      val value = g.generate
+      assert(test(value), "test failed for " + value)
+    }
+    println("passed " + numTimes + " tests")
+  }
+
+  // ------------------------------------------------------------------------------------------------------------------
 
   def main(args: Array[String]): Unit = {
 
@@ -149,5 +195,21 @@ object RandomGenerators {
 
     val choice: Generator[Int] = choose(0, 3)
     println(choice.generate)
+
+    for (i <- 1 to 5) {
+      val ne = lists.generate
+      println(ne)
+    }
+
+    for (i <- 1 to 5) {
+      val tr = trees.generate
+      println(tr)
+    }
+
+    // Example usage of test function
+    test(pairs_(lists, lists)) {
+      // Note (xs ++ ys).length > xs.length will fail on two empty lists or a non-empty list and an empty list
+      case (xs, ys) => (xs ++ ys).length >= xs.length
+    }
   }
 }
