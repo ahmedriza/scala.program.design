@@ -31,9 +31,15 @@ object ForTranslation {
     bird2 foreach println
 
     val bird3 = books.flatMap(b =>
-      b.authors.withFilter(a => a startsWith "Bird").map(b => b)
-    )
+      for (a <- b.authors.withFilter(a => a.startsWith("Bird"))) yield b.title)
     bird3 foreach println
+
+    val bird4 = books.flatMap(b =>
+      b.authors.withFilter(a => a.startsWith("Bird")).map(_ => b.title))
+    bird4 foreach println
+
+    // Lecture 1.2 - Translation of For, shows this @ 9:53, but this is wrong
+    // books.flatMap(b => b.authors.withFilter(a => a.startsWith("Bird")).map(y => y.title))
 
   }
 
