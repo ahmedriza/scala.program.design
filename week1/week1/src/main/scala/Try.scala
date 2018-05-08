@@ -8,9 +8,17 @@ import scala.util.control.NonFatal
 
 abstract class Try[+T] {
 
-  def flatMap[U](f: T => Try[U]): Try[U] = ???
+  def flatMap[U](f: T => Try[U]): Try[U] = this match {
+    case Success(x) => try f(x) catch {
+      case NonFatal(ex) => Failure(ex)
+    }
+    case fail: Failure => fail
+  }
 
-  def map[U](f: T => U): Try[U] = ???
+  def map[U](f: T => U): Try[U] = this match {
+    case Success(x) => Try(f(x))
+    case fail: Failure => fail
+  }
 
 }
 
@@ -50,3 +58,26 @@ object Try {
     println(result)
   }
 }
+
+// It looks like Try might be a Monad, with unit = Try. Is It?
+// (a) Yes
+// (b) No, the associative law fails
+// (c) No, the left unit law fails
+// (d) No, the right unit law fails
+// (e) No, two or more Monad laws fail.
+
+// Check
+// (1) Left unit law
+// unit(x) flatMap f = f(x)
+// Need to show that: Try(x) flatMap f = f(x)
+// Try(x) flatMap f
+// == this match {
+//         case Success(x) => try f(x) match { case NonFatal(ex) => Failure(ex) }
+//         case Failure    => Failure
+// However,
+// Neither Try(x) or flatMap will raise an exception, however, f(x) can raise exceptions
+//
+// Hence Try(x) flatMap f != f(x)
+
+
+

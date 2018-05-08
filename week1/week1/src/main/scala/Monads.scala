@@ -17,6 +17,8 @@ trait M[T] {
 
 // def unit[T](x: T): M[T]
 
+// If they also define 'withFilter', they are called "Monads with zero"
+
 // Example of Monads
 //
 // (1) List is a monad with unit(x) = List(x)
