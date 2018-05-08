@@ -81,6 +81,6 @@ object ForExpressions {
         x % y == 0) map (y => (x, y)))
 
     println(tmp1)
-    println(tmp2) 
+    println(tmp2)
   }
 }
