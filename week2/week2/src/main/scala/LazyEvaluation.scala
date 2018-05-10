@@ -47,32 +47,29 @@ trait LazyStream[+A] {
     // to filter happens as the 2nd parameter to cons() which is
     // a by-name parameter, hence the tail won't be evaluated until
     // someone actually asks for it.
-    else if (p(head)) LazyStream.cons(head, tail.filter(p))
-    else tail.filter(p)
+    else if (p(head)) {
+      LazyStream.cons(head, tail.filter(p))
+    }
+    else {
+      tail.filter(p)
+    }
 }
 
 object LazyStream {
-
   // Note that the tl parameter is by-name
   // Contrast this with the Cons class for Lists where the tail parameter
   // is a normal call-by-value parameter
   // That is the only thing that matters between Lists and Streams.
 
   def cons[T](hd: T, tl: => LazyStream[T]): LazyStream[T] = new LazyStream[T] {
-
     override def isEmpty: Boolean = false
-
     override def head: T = hd
-
     lazy val tail: LazyStream[T] = tl
   }
 
   val empty: LazyStream[Nothing] = new LazyStream[Nothing] {
-
     override def isEmpty: Boolean = true
-
     override def head = throw new NoSuchElementException("empty.head")
-
     override def tail = throw new NoSuchElementException("empty.tail")
   }
 }
@@ -108,13 +105,82 @@ object LazyEvaluation {
     //
     // Let's use the substitution model to figure out what happens to:
     //
-    val result = (streamRange(1000, 10000) filter isPrime) apply 1
+    val result = streamRange(1000, 10000).filter(isPrime).apply(1)
     println(result)
 
     //
     // if (1000 > 10000) empty
-    // else cons(1000, streamRange(1000 + 1, 10000))
-    // .filter(isPrime).apply(1)
+    // else cons(1000, streamRange(1000 + 1, 10000)).filter(isPrime).apply(1)
     //
+    // Let C1 = cons(1000, streamRange(1000 + 1, 10000))
+    //
+    // filter:
+    // (if (C1.isEmpty) C1
+    // else if (isPrime(C1.head)) cons(C1.head, C1.tail.filter(isPrime))
+    // else C1.tail.filter(isPrime)
+    // ).apply(1)
+
+    // (if (isPrime(C1.head)) cons(C1.head, C1.tail.filter(isPrime))
+    // else C1.tail.filter(isPrime)
+    // ).apply(1)
+
+    // (if (isPrime(1000)) cons(C1.head, C1.tail.filter(isPrime))
+    // else C1.tail.filter(isPrime)
+    // ).apply(1)
+
+    // (if (false) cons(C1.head, C1.tail.filter(isPrime))
+    // else C1.tail.filter(isPrime)
+    // ).apply(1)
+
+    // (C1.tail.filter(isPrime)).apply(1)
+
+    // C1.tail = streamRange(1001, 10000)
+    // streamRange(1001, 10000).filter(isPrime).apply(1)
+    //
+    // ^ This is like what we started out with, but with 1001 instead of 1000.
+    // This evaluation continues until:
+
+    // streamRange(1009, 10000).filter(isPrime).apply(1)
+    //
+    // if (1009 > 10000) empty
+    // else cons(1009, streamRange(1009 + 1, 10000)).filter(isPrime).apply(1)
+
+    // Let C2 = cons(1009, streamRange(1009 + 1, 10000))
+    // C2.filter(isPrime).apply(1)
+    // Evaluate filter:
+
+    // cons(1009, C2.tail.filter(isPrime)).apply(1)
+
+    // Now we need to apply apply on this cons expression
+    //
+    // if (1 == 0) cons(1009, C2.tail.filter(isPrime)).head
+    // else cons(1009, C2.tail.filter(isPrime)).tail.apply(0)
+
+    // Now we evaluate tail:
+
+    // C2.tail.filter(isPrime).apply(0)
+    // streamRange(1010, 10000).filter(isPrime).apply(0)
+
+    // This process continues until we hit the next prime number, 1013
+
+    // streamRange(1013, 10000).filter(isPrime).apply(0)
+    // streamRange expands to
+    // cons(1013, streamRange(1013 + 1, 10000)).filter(isPrime).apply(0)
+
+    // Let C3 = cons(1013, streamRange(1013 + 1, 10000))
+    // C3.filter(isPrime).apply(0)
+    // Evaluate filter
+
+    // cons(1013, C3.tail.filter(isPrime)).apply(0)
+    //
+    // Evaluate apply
+    // if (0 == 0) cons(1013, C3.tail.filter(isPrime)).head
+    //
+    // Evaluate head
+    // 1013
+    // final answer
+
+    // Only the part of the stream necessary to compute the result has been constructed.
+
   }
 }
