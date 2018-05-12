@@ -92,8 +92,8 @@ object WaterPouring {
   def main(args: Array[String]): Unit = {
     val waterPouring = new WaterPouring(Vector(4, 7))
 
-    println("glasses: " + waterPouring.glasses.toList)
-    println("moves: " + waterPouring.moves)
+    println("moves: ")
+    waterPouring.moves.foreach(println)
     println("--------------------------------------------")
 
     val s1 = waterPouring.Pour(1, 0).change(Vector(0, 7))
