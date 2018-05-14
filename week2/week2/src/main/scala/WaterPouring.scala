@@ -40,6 +40,7 @@
   * +------------------------------------------------+
   *
   * How do we generate moves to find the right solution, say target capacity of 6?
+  *
   */
 
 class WaterPouring(capacity: Vector[Int]) {
@@ -181,6 +182,18 @@ object WaterPouring {
 
     val result = waterPouring.solution(6)
     println(result)
+
+    //
+    // (0,0) -> Fill(1)   -> (0,9)
+    // (0,9) -> Pour(1,0) -> (4,5)
+    // (4,5) -> Empty(0)  -> (0,5)
+    // (0,5) -> Pour(1,0) -> (4,1)
+    // (4,1) -> Empty(0)  -> (0,1)
+    // (0,1) -> Pour(1,0) -> (1,0)
+    // (1,0) -> Fill(1)   -> (1,9)
+    // (1,9) -> Pour(1,0) -> (4,6)
+    //
+    // --> Vector(4, 6), ?)
 
   }
 
