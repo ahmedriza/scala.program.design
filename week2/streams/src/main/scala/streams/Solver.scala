@@ -2,6 +2,8 @@ package streams
 
 import common._
 
+import scala.collection.immutable
+
 /**
  * This component implements the solver for the Bloxorz game
  */
@@ -29,7 +31,13 @@ trait Solver extends GameDef {
    * that are inside the terrain.
    */
   def neighborsWithHistory(b: Block, history: List[Move]): Stream[(Block, List[Move])] = {
-    ???
+
+    def loop(xs: List[(Block, Move)]): Stream[(Block, List[Move])] = xs match {
+      case Nil => Stream.empty
+      case y :: ys => Stream.cons((y._1, y._2 :: history), loop(ys))
+    }
+
+    loop(b.legalNeighbors)
   }
 
   /**
