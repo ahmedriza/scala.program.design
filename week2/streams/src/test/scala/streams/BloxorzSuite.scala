@@ -31,7 +31,7 @@ class BloxorzSuite extends FunSuite {
   trait Level1 extends SolutionChecker {
       /* terrain for level 1*/
 
-    val level =
+    val level: String =
     """ooo-------
       |oSoooo----
       |ooooooooo-

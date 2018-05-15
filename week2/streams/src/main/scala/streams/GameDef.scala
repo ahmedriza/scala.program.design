@@ -139,8 +139,12 @@ trait GameDef {
      * which are inside the terrain.
      */
     def legalNeighbors: List[(Block, Move)] = {
+      val result = for {
+        nb <- neighbors
+        if terrain(nb._1.b1) && terrain(nb._1.b2)
+      } yield nb
 
-      ???
+      result
     }
 
     /**
