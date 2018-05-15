@@ -53,4 +53,7 @@ class StringParserTerrainTest extends FunSuite {
     assert(block4.isLegal === false)
   }
 
+  test("neighbours") {
+    println(parser.startBlock.neighbors)
+  }
 }

@@ -22,7 +22,7 @@ object Bloxorz extends App {
   abstract class Level extends Solver with StringParserTerrain
 
   object Level0 extends Level {
-    val level =
+    val level: String =
       """------
         |--ST--
         |--oo--
@@ -36,7 +36,7 @@ object Bloxorz extends App {
    * Level 1 of the official Bloxorz game
    */
   object Level1 extends Level {
-    val level =
+    val level: String =
       """ooo-------
         |oSoooo----
         |ooooooooo-
