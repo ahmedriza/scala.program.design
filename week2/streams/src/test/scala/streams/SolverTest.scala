@@ -17,6 +17,23 @@ class SolverTest extends FunSuite {
     * 5 ------ooo-
     */
 
+  /**
+    *    0  1  2  3  4  5  6  7  8  9
+    *   +--+--+--+
+    * 0 |  |  |  |
+    *   +--+--+--+--+--+--+
+    * 1 |  | S|  |  |  |  |
+    *   +--+--+--+--+--+--+--+--+--+
+    * 2 |  |  |  |  |  |  |  |  |  |
+    *   +--+--+--+--+--+--+--+--+--+--+
+    * 3    |  |  |  |  |  |  |  |  |  |
+    *      +--+--+--+--+--+--+--+--+--+
+    * 4                |  |  | T|  |  |
+    *                  +--+--+--+--+--+
+    * 5                   |  |  |  |
+    *                     +--+--+--+
+    */
+
   val solver: Solver = new Solver with InfiniteTerrain {
     /**
       * The position where the block is located initially.
