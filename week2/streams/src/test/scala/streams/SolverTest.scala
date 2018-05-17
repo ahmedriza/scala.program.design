@@ -18,6 +18,8 @@ class SolverTest extends FunSuite {
     */
 
   /**
+    *  List(Right, Down, Down, Right, Right, Down, Right)
+    *
     *    0  1  2  3  4  5  6  7  8  9
     *   +--+--+--+
     * 0 |  |  |  |
@@ -29,6 +31,25 @@ class SolverTest extends FunSuite {
     * 3    |  |  |  |  |--|--|  |  |  |
     *      +--+--+--+--+--+--+--+--+--+
     * 4                |--|--| T|  |  |
+    *                  +--+--+--+--+--+
+    * 5                   |  |  |  |
+    *                     +--+--+--+
+    */
+
+  /**
+    *   List(Right, Right, Down, Right, Right, Right, Down)
+    *
+    *    0  1  2  3  4  5  6  7  8  9
+    *   +--+--+--+
+    * 0 |  |  |  |
+    *   +--+--+--+--+--+--+
+    * 1 |  | S|--|--| x|  |
+    *   +--+--+--+--+--+--+--+--+--+
+    * 2 |  |  |  |  |- |- |- |- |  |
+    *   +--+--+--+--+--+--+--+--+--+--+
+    * 3    |  |  |  |- |- |- |- |  |  |
+    *      +--+--+--+--+--+--+--+--+--+
+    * 4                |  |  | T|  |  |
     *                  +--+--+--+--+--+
     * 5                   |  |  |  |
     *                     +--+--+--+
@@ -80,5 +101,14 @@ class SolverTest extends FunSuite {
     // Moves, with last first
     val history = List(Right, Down, Down, Right, Right, Down, Right)
     solver.neighborsWithHistory(b8, history).toSet foreach println
+  }
+
+  test("neighboursWithHistory") {
+    import solver._
+    val nbh = neighborsWithHistory(Block(Pos(1,1),Pos(1,1)), List(Left,Up)).toSet
+    assert(nbh === Set(
+      (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
+      (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+    ))
   }
 }
