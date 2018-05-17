@@ -86,7 +86,7 @@ class SolverTest extends FunSuite {
     import solver._
 
     val result = newNeighborsOnly(Stream.empty, Set())
-    println(result)
+    assert(result === Stream.empty)
   }
 
   test("newNeighboursOnly") {
