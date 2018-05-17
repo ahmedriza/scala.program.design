@@ -81,4 +81,26 @@ class SolverTest extends FunSuite {
     val history = List(Right, Down, Down, Right, Right, Down, Right)
     solver.neighborsWithHistory(b8, history).toSet foreach println
   }
+
+  test("newNeighboursOnly with empty stream") {
+    import solver._
+
+    val result = newNeighborsOnly(Stream.empty, Set())
+    println(result)
+  }
+
+  test("newNeighboursOnly") {
+    import solver._
+
+    val result = newNeighborsOnly(
+      Set(
+        (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
+        (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+      ).toStream,
+
+      Set(Block(Pos(1,2),Pos(1,3)), Block(Pos(1,1),Pos(1,1)))
+    )
+
+    assert(result.toSet === Set((Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))))
+  }
 }
