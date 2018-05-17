@@ -121,6 +121,7 @@ class WaterPouring(capacity: Vector[Int]) {
         next <- moves.map(m => path.extend(m))
         if !(explored contains next.endState)
       } yield next
+
       paths #:: from(more, explored ++ more.map(p => p.endState))
     }
 

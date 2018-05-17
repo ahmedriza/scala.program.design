@@ -20,7 +20,7 @@ class SolverTest extends FunSuite {
   /**
     *  List(Right, Down, Down, Right, Right, Down, Right)
     *
-    *    0  1  2  3  4  5  6  7  8  9
+    *     0  1  2  3  4  5  6  7  8  9
     *   +--+--+--+
     * 0 |  |  |  |
     *   +--+--+--+--+--+--+
@@ -39,7 +39,7 @@ class SolverTest extends FunSuite {
   /**
     *   List(Right, Right, Down, Right, Right, Right, Down)
     *
-    *    0  1  2  3  4  5  6  7  8  9
+    *     0  1  2  3  4  5  6  7  8  9
     *   +--+--+--+
     * 0 |  |  |  |
     *   +--+--+--+--+--+--+
@@ -50,6 +50,24 @@ class SolverTest extends FunSuite {
     * 3    |  |  |  |- |- |- |- |  |  |
     *      +--+--+--+--+--+--+--+--+--+
     * 4                |  |  | T|  |  |
+    *                  +--+--+--+--+--+
+    * 5                   |  |  |  |
+    *                     +--+--+--+
+    */
+
+  /**
+    *
+    *     0  1  2  3  4  5  6  7  8  9
+    *   +--+--+--+
+    * 0 |  |  |  |
+    *   +--+--+--+--+--+--+
+    * 1 |  | S|- |- |  |  |
+    *   +--+--+--+--+--+--+--+--+--+
+    * 2 |  |  |- |- |  |  |  |  |  |
+    *   +--+--+--+--+--+--+--+--+--+--+
+    * 3    |  | -| -|  |  |  |  |  |  |
+    *      +--+--+--+--+--+--+--+--+--+
+    * 4                |  |  |  |  |  |
     *                  +--+--+--+--+--+
     * 5                   |  |  |  |
     *                     +--+--+--+
@@ -81,6 +99,32 @@ class SolverTest extends FunSuite {
         |------ooo-""".stripMargin
   }
 
+  val impossibleSolver: Solver = new Solver with StringParserTerrain {
+    /**
+      * The position where the block is located initially.
+      *
+      * This value is left abstract, it will be defined in concrete
+      * instances of the game.
+      */
+    override lazy val startPos = Pos(1,1)
+    /**
+      * The target position where the block has to go.
+      * This value is left abstract.
+      */
+    override lazy val goal: Pos = Pos(1,1)
+    /**
+      * A ASCII representation of the terrain. This field should remain
+      * abstract here.
+      */
+    override val level: String =
+      """ooo-------
+        |oSoooo----
+        |ooooooooT-
+        |-ooooooooo
+        |-----ooooo
+        |------ooo-""".stripMargin
+  }
+
   test("solve") {
     import solver._
 
@@ -103,6 +147,13 @@ class SolverTest extends FunSuite {
     solver.neighborsWithHistory(b8, history).toSet foreach println
   }
 
+  test("newNeighboursOnly with empty stream") {
+    import solver._
+
+    val result = newNeighborsOnly(Stream.empty, Set())
+    assert(result === Stream.empty)
+  }
+
   test("neighboursWithHistory") {
     import solver._
     val nbh = neighborsWithHistory(Block(Pos(1,1),Pos(1,1)), List(Left,Up)).toSet
@@ -110,5 +161,36 @@ class SolverTest extends FunSuite {
       (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
       (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
     ))
+  }
+
+  test("newNeighboursOnly") {
+    import solver._
+
+    val result = newNeighborsOnly(
+      Set(
+        (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
+        (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+      ).toStream,
+
+      Set(Block(Pos(1,2),Pos(1,3)), Block(Pos(1,1),Pos(1,1)))
+    )
+
+    assert(result.toSet === Set((Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))))
+  }
+
+  test("from") {
+    import solver._
+    println("Paths from Start:")
+    pathsFromStart.take(10).toSet foreach println
+    println("------------------------")
+    pathsToGoal.take(100).toSet foreach println
+    println("------------------------")
+    println(solution)
+  }
+
+  test("impossibl") {
+    import impossibleSolver._
+    // println("Impossible Solution")
+    // println(solution)
   }
 }
