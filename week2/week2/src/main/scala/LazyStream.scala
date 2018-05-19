@@ -1,5 +1,9 @@
+import scala.annotation.tailrec
 
 trait LazyStream[+A] {
+
+  import LazyStream._
+
   def isEmpty: Boolean
   def head: A
   def tail: LazyStream[A]
@@ -18,7 +22,7 @@ trait LazyStream[+A] {
     // a by-name parameter, hence the tail won't be evaluated until
     // someone actually asks for it.
     else if (p(head)) {
-      LazyStream.cons(head, tail.filter(p))
+      cons(head, tail.filter(p))
     }
     else {
       tail.filter(p)
@@ -26,19 +30,20 @@ trait LazyStream[+A] {
 
   def map[B](f: A => B): LazyStream[B] =
     if (isEmpty) LazyStream.empty
-    else LazyStream.cons(f(head), tail.map(f))
+    else cons(f(head), tail.map(f))
 
   def take(n: Int): LazyStream[A] =
     if (n <= 0 || isEmpty) LazyStream.empty
-    else LazyStream.cons(head, tail.take(n - 1))
+    else cons(head, tail.take(n - 1))
+
 }
 
 object LazyStream {
+
   // Note that the tl parameter is by-name
   // Contrast this with the Cons class for Lists where the tail parameter
   // is a normal call-by-value parameter
   // That is the only thing that matters between Lists and Streams.
-
   def cons[T](hd: T, tl: => LazyStream[T]): LazyStream[T] = new LazyStream[T] {
     override def isEmpty: Boolean = false
     override def head: T = hd

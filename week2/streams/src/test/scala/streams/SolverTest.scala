@@ -1,8 +1,11 @@
 package streams
 
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+
+import scala.collection.immutable
 
 @RunWith(classOf[JUnitRunner])
 class SolverTest extends FunSuite {
@@ -65,7 +68,7 @@ class SolverTest extends FunSuite {
     *   +--+--+--+--+--+--+--+--+--+
     * 2 |  |  |- |- |  |  |  |  |  |
     *   +--+--+--+--+--+--+--+--+--+--+
-    * 3    |  | -| -|  |  |  |  |  |  |
+    * 3    |  |- |- |  |  |  |  |  |  |
     *      +--+--+--+--+--+--+--+--+--+
     * 4                |  |  |  |  |  |
     *                  +--+--+--+--+--+
@@ -183,14 +186,25 @@ class SolverTest extends FunSuite {
     println("Paths from Start:")
     pathsFromStart.take(10).toSet foreach println
     println("------------------------")
-    pathsToGoal.take(100).toSet foreach println
+    pathsToGoal.toSet foreach println
     println("------------------------")
     println(solution)
   }
 
-  test("impossibl") {
+  test("impossible") {
     import impossibleSolver._
     // println("Impossible Solution")
     // println(solution)
+  }
+
+  test("loop") {
+    import solver._
+
+    val initial: Stream[(Block, List[Move])] = neighborsWithHistory(startBlock, List())
+    println(s"startBlock: $startBlock")
+    println(s"initial: ${initial.toSet}")
+
+    val result2 = from(initial, Set(startBlock))
+    println(s"result2: ${result2.take(10).toList}")
   }
 }

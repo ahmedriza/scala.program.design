@@ -91,21 +91,6 @@ trait Solver extends GameDef {
    */
   def from(initial: Stream[(Block, List[Move])], explored: Set[Block]): Stream[(Block, List[Move])] = {
 
-    @tailrec
-    def loop(init: Stream[(Block, List[Move])], acc: Stream[(Block, List[Move])], explored: Set[Block]): Stream[(Block, List[Move])] = init match {
-      case hd #:: tl =>
-
-        val more: Stream[(Block, List[Move])] = for {
-          // New neighbours that can be reached from head
-          nnb <- newNeighborsOnly(neighborsWithHistory(hd._1, hd._2), explored)
-          if !explored.contains(nnb._1)
-        } yield nnb
-
-        loop(tl, more #::: acc, explored ++ more.map(p => p._1))
-      case _ => Stream.empty
-    }
-
-    /*
     val more: Stream[(Block, List[Move])] = for {
       // head of initial
       hd <- initial
@@ -113,10 +98,11 @@ trait Solver extends GameDef {
       nnb <- newNeighborsOnly(neighborsWithHistory(hd._1, hd._2), explored)
       if !explored.contains(nnb._1)
     } yield nnb
-    */
-    // initial #::: from(more, explored ++ more.map(p => p._1))
 
-    initial #::: loop(initial, Stream.empty, explored)
+    if (initial.isEmpty) Stream.empty
+    else {
+      initial #::: from(more, explored ++ more.map(p => p._1))
+    }
   }
 
   /**
