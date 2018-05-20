@@ -193,8 +193,7 @@ class SolverTest extends FunSuite {
 
   test("impossible") {
     import impossibleSolver._
-    // println("Impossible Solution")
-    // println(solution)
+    assert(solution === List())
   }
 
   test("loop") {
