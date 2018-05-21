@@ -59,6 +59,14 @@ abstract class Gates extends Simulation {
     in2 addAction orAction
   }
 
+  def orGateAlt(in1: Wire, in2: Wire, output: Wire): Unit = {
+    val notIn1, notIn2, notOut = new Wire
+    inverter(in1, notIn1)
+    inverter(in2, notIn2)
+    andGate(notIn1, notIn2, notOut)
+    inverter(notOut, output)
+  }
+
   /**
     * Exercise
     * --------

@@ -60,7 +60,7 @@ object DiscreteEventSimulation extends Circuits with Parameters {
 
   import DiscreteEventSimulation._
 
-  def main(args: Array[String]): Unit = {
+  def halfAdderSimulation(): Unit = {
     val in1, in2, sum, carry = new Wire
     halfAdder(in1, in2, sum, carry)
     probe("sum", sum)
@@ -77,7 +77,10 @@ object DiscreteEventSimulation extends Circuits with Parameters {
     // Change signal of in1 to false
     in1 setSignal false
     run()
+  }
 
+  def main(args: Array[String]): Unit = {
+    
   }
 }
 
