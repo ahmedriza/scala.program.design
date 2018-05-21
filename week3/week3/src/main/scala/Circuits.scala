@@ -75,15 +75,16 @@
   *   andGate(d, e, s)
   * }
   *
-  * This half-adder can in turn be used to define a full adder:
+  * This half-adder can in turn be used to define a full adder (ADDER):
   *
-  *                     +-----+
-  *                     |     |------------------- sum
-  * a   ----------------|  HA |      +-----+
-  *            +-----+  |     |------| OR  |------ cout
-  * b   -------|  HA |  +-----+      |     |
-  *            |     |---------------|-----+
-  * cin -------|     |
+  *                         +-----+
+  *                         |     |------------------- sum
+  *   a --------------------|  HA |      +-----+
+  *            +-----+  s   |     |  c2  |     |
+  *   b -------|     |------|     |------| OR  |------ cout
+  *            | HA  |      +-----+      |     |
+  * cin -------|     |-------------------|     |
+  *            |     |      c1           +-----+
   *            +-----+
   *
   * def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire): Unit = {
@@ -95,8 +96,59 @@
   *   orGate(c1, c2, cout)
   * }
   *
+  *
+  * Exercise: What logical function does this program describe?
+  * -----------------------------------------------------------
+  *
+  * def f(a: Wire, b: Wire, c: Wire): Unit = {
+  *   val d, e, f g = new Wire
+  *   inverter(a, d)
+  *   inverter(b, e)
+  *   andGate(a, e, f)
+  *   andGate(b, d, g)
+  *   orGate(f, g, c)
+  * }                                                      +-----------------------------+----+
+  *                                                        |                             |    |
+  * a ------------- INV --- d -----------------------------|-----+-----+                 | OR |
+  *       |                         +-----+                |     |     |                 |    |---- c
+  *       --------------------------|     |                |     |     |                 |    |
+  * b --------------INV --- e ------| AND |---- f ---------+     | AND |---- g ----------+----+
+  *       |                         +-----+                      |     |
+  *       |                                                      |     |
+  *       -------------------------------------------------------+-----+
+  *
+  * a  b    d=not(a)  e=not(b) f=a&e  g=b&d    c=f|g
+  * ----------------------------------------------------------------------
+  * T  T      F          F      F      F       F
+  * T  F      F          T      T      F       T
+  * F  T      T          F      F      T       T
+  * F  F      T          T      F      F       F
+  *
+  * f = a & not(b)
+  * g = b & not(a)
+  * c = f | g = a & not(b) | b & not(a)
+  *
+  * Hence this calculates a != b
+  * ----------------------------
+  * ----------------------------
+  *
+  *
   */
 
-object Circuits {
+abstract class Circuits extends Gates {
 
+   def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire): Unit = {
+     val d, e = new Wire
+     orGate(a, b, d)
+     andGate(a, b, c)
+     inverter(c, e)
+     andGate(d, e, s)
+   }
+
+  def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire): Unit = {
+    val s, c1, c2 = new Wire
+    halfAdder(a, cin, s, c1)
+    halfAdder(b, s, sum, c2)
+    orGate(c1, c2, cout)
+  }
 }
