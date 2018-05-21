@@ -11,7 +11,7 @@ abstract class Gates extends Simulation {
 
   def OrGateDelay: Int
 
-  class Wire {
+  class Wire() {
 
     private var sigValue = false
     private var actions: List[Action] = List()

@@ -60,8 +60,12 @@ object DiscreteEventSimulation extends Circuits with Parameters {
 
   import DiscreteEventSimulation._
 
-  def main(args: Array[String]): Unit = {
-    val in1, in2, sum, carry = new Wire
+  def halfAdderSimulation(): Unit = {
+    val in1 = new Wire
+    val in2 = new Wire
+    val sum = new Wire
+    val carry = new Wire
+
     halfAdder(in1, in2, sum, carry)
     probe("sum", sum)
     probe("carry", carry)
@@ -71,13 +75,38 @@ object DiscreteEventSimulation extends Circuits with Parameters {
     run()
 
     // Lets put an input signal on in2
-    in2 setSignal true
-    run()
+    // in2 setSignal true
+    // run()
 
     // Change signal of in1 to false
-    in1 setSignal false
+    // in1 setSignal false
+    // run()
+  }
+
+  def basicSimulation(): Unit = {
+
+    val i1 = new Wire
+    val o1 = new Wire
+    inverter(i1, o1)
+
+    val i2 = new Wire
+    val o2 = new Wire
+    andGate(o1, i2, o2)
+
+    // probe("i1", i1)
+    // probe("o2", o2)
+
+    // i1 setSignal false
+    i2 setSignal true
     run()
 
+    // i2 setSignal false
+    // run()
+  }
+
+  def main(args: Array[String]): Unit = {
+    basicSimulation()
+    // halfAdderSimulation()
   }
 }
 
