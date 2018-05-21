@@ -61,11 +61,7 @@ object DiscreteEventSimulation extends Circuits with Parameters {
   import DiscreteEventSimulation._
 
   def halfAdderSimulation(): Unit = {
-    val in1 = new Wire
-    val in2 = new Wire
-    val sum = new Wire
-    val carry = new Wire
-
+    val in1, in2, sum, carry = new Wire
     halfAdder(in1, in2, sum, carry)
     probe("sum", sum)
     probe("carry", carry)
