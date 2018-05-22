@@ -100,9 +100,23 @@ object DiscreteEventSimulation extends Circuits with Parameters {
     // run()
   }
 
+  def orGateSimulation(): Unit = {
+    val i1 = new Wire
+    val i2 = new Wire
+    val out = new Wire
+
+    orGateAlt(i1, i2, out)
+
+    probe("out", out)
+    i1 setSignal true
+    i2 setSignal true
+    run()
+  }
+
   def main(args: Array[String]): Unit = {
-    basicSimulation()
+    // basicSimulation()
     // halfAdderSimulation()
+    orGateSimulation()
   }
 }
 

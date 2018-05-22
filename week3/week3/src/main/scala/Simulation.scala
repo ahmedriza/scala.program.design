@@ -50,10 +50,10 @@ abstract class Simulation {
   @tailrec
   private def loop(): Unit = agenda match {
     case first :: rest =>
-      println(s"Running loop, current time, $curtime, agenda: $agenda")
+      // println(s"Running loop, current time, $curtime, agenda: $agenda")
       agenda = rest
       curtime = first.time
-      println(s"current time: $curtime")
+      // println(s"current time: $curtime")
       first.action()
       loop()
 
