@@ -4,7 +4,7 @@ import common._
 
 trait IntHeap extends Heap {
   override type A = Int
-  override def ord = scala.math.Ordering.Int
+  override def ord: Ordering.Int.type = scala.math.Ordering.Int
 }
 
 // http://www.brics.dk/RS/96/37/BRICS-RS-96-37.pdf
@@ -43,8 +43,8 @@ trait BinomialHeap extends Heap {
 
   protected def ins(t: Node, ts: H): H = ts match {
     case Nil => List(t)
-    case tp::ts => // t.r<=tp.r
-      if (t.r < tp.r) t::tp::ts else ins(link(t, tp), ts)
+    case tp::tss => // t.r<=tp.r
+      if (t.r < tp.r) t::tp::tss else ins(link(t, tp), tss)
   }
 
   override def empty: Nil.type = Nil
@@ -56,30 +56,30 @@ trait BinomialHeap extends Heap {
   override def meld(ts1: H, ts2: H): H = (ts1, ts2) match {
     case (Nil, ts) => ts
     case (ts, Nil) => ts
-    case (t1::ts1, t2::ts2) =>
-      if (t1.r<t2.r) t1::meld(ts1,t2::ts2)
-      else if (t2.r<t1.r) t2::meld(t1::ts1,ts2)
-      else ins(link(t1,t2),meld(ts1,ts2))
+    case (t1::tss1, t2::tss2) =>
+      if (t1.r < t2.r) t1::meld(tss1, t2::tss2)
+      else if (t2.r < t1.r) t2::meld(t1::tss1, tss2)
+      else ins(link(t1, t2),meld(tss1, tss2))
   }
 
   override def findMin(ts: H): A = ts match {
     case Nil => throw new NoSuchElementException("min of empty heap")
     case t::Nil => root(t)
-    case t::ts =>
-      val x = findMin(ts)
+    case t::tss =>
+      val x = findMin(tss)
       if (ord.lteq(root(t),x)) root(t) else x
   }
 
   override def deleteMin(ts: H): List[Node] = ts match {
     case Nil => throw new NoSuchElementException("delete min of empty heap")
-    case t::ts =>
+    case t::tss =>
       def getMin(t: Node, ts: H): (Node, H) = ts match {
         case Nil => (t, Nil)
         case tp::tsp =>
           val (tq,tsq) = getMin(tp, tsp)
           if (ord.lteq(root(t),root(tq))) (t,ts) else (tq,t::tsq)
       }
-      val (Node(_,_,c),tsq) = getMin(t, ts)
+      val (Node(_,_,c),tsq) = getMin(t, tss)
       meld(c.reverse, tsq)
   }
 }
@@ -87,7 +87,7 @@ trait BinomialHeap extends Heap {
 trait Bogus1BinomialHeap extends BinomialHeap {
   override def findMin(ts: H): A = ts match {
     case Nil => throw new NoSuchElementException("min of empty heap")
-    case t::ts => root(t)
+    case t::tss => root(t)
   }
 }
 
@@ -104,13 +104,13 @@ trait Bogus3BinomialHeap extends BinomialHeap {
 trait Bogus4BinomialHeap extends BinomialHeap {
   override def deleteMin(ts: H): List[Node] = ts match {
     case Nil => throw new NoSuchElementException("delete min of empty heap")
-    case t::ts => meld(t.c.reverse, ts)
+    case t::tss => meld(t.c.reverse, tss)
   }
 }
 
 trait Bogus5BinomialHeap extends BinomialHeap {
   override def meld(ts1: H, ts2: H): List[Node] = ts1 match {
     case Nil => ts2
-    case t1::ts1 => List(Node(t1.x, t1.r, ts1++ts2))
+    case t1::tss1 => List(Node(t1.x, t1.r, tss1 ++ ts2))
   }
 }
