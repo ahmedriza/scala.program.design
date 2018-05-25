@@ -43,8 +43,12 @@ trait BinomialHeap extends Heap {
 
   protected def ins(t: Node, ts: H): H = ts match {
     case Nil => List(t)
-    case tp::tss => // t.r<=tp.r
-      if (t.r < tp.r) t::tp::tss else ins(link(t, tp), tss)
+    case tp::tss =>
+      if (t.r < tp.r) { // t.r <= tp.r
+        t::tp::tss
+      } else {
+        ins(link(t, tp), tss)
+      }
   }
 
   override def empty: Nil.type = Nil

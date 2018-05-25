@@ -109,7 +109,7 @@ object DiscreteEventSimulation extends Circuits with Parameters {
 
     probe("out", out)
     i1 setSignal true
-    i2 setSignal true
+    // i2 setSignal true
     run()
   }
 
