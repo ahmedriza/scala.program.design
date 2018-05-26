@@ -15,9 +15,11 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     val tmp: Gen[H] = Gen.oneOf(
       const(empty),
       for {
-        v <- arbitrary[Int]
-        h <- insert(v, empty)
-      } yield h
+        v1 <- arbitrary[Int]
+        v2 <- arbitrary[Int]
+        h1 <- insert(v1, empty)
+        h2 <- insert(v2, h1)
+      } yield h2
     )
 
     tmp
@@ -33,6 +35,16 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
   property("insert a into empty H, findMin == a") = forAll { a: Int =>
     val h = insert(a, empty)
     findMin(h) == a
+  }
+
+  property("insert a, b, c into empyt H, findMin = min(a, b, c)") = forAll { (a: Int, b: Int, c: Int) =>
+    val h1 = insert(a, empty)
+    val h2 = insert(b, h1)
+    val h3 = insert(c, h2)
+
+    val min = findMin(h3)
+    val expectedMin = math.min(math.min(a, b), c)
+    min == expectedMin
   }
 
   // If you insert any two elements into an empty heap, finding the minimum of
@@ -55,7 +67,17 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
   // Given any heap, you should get a sorted sequence of elements when continually finding
   // and deleting minima. (Hint: recursion and helper functions)
   property("sorted sequence") = forAll { h: H =>
+    val sortedSequence = f(h, List()).reverse
+    sortedSequence.sorted == sortedSequence
+  }
 
+  def f(h: H, acc: List[Int]): List[Int] = {
+    if (isEmpty(h)) {
+      acc
+    } else {
+      val min = findMin(h)
+      f(deleteMin(h), min :: acc)
+    }
   }
 
   // Finding the minimum of the melding of any two heaps should return

@@ -62,13 +62,26 @@ object HeapTest {
         )
       )
 
-    // val min = binomailHeap.deleteMin(h5)
-    // println(min)
 
-    import org.scalacheck.Prop.forAll
-    val propConcatLists = forAll {
-      (l1: List[Int], l2: List[Int]) => l1.size + l2.size == (l1 ::: l2).size
+    // + Heap.insert a into empty H, deleteMin == empty H: OK, passed 100 tests.
+    // List(-1, -2147483648)
+    // ! Heap.sorted sequence: Falsified after 0 passed tests.
+    // > ARG_0: List(Node(-2147483648,1,List(Node(-1,0,List()))))
+
+    def f(h: H, acc: List[Int]): List[Int] = {
+      if (isEmpty(h)) {
+        acc
+      } else {
+        val min = findMin(h)
+        f(deleteMin(h), min :: acc)
+      }
     }
-    propConcatLists.check
+
+    val h6 = insert(-1, empty)
+    val h7 = insert(-2147483648, h6)
+    println(s"h7: $h7")
+    val sortedList = f(h7, List()).reverse
+
+    println(sortedList)
   }
 }
