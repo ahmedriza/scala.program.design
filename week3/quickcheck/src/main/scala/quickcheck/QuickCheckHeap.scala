@@ -1,28 +1,33 @@
 package quickcheck
 
 import common._
-
 import org.scalacheck._
 import Arbitrary._
 import Gen._
 import Prop.forAll
 import org.scalacheck.Prop.BooleanOperators
 
+import scala.annotation.tailrec
+
 abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
 
   lazy val genHeap: Gen[H] = {
 
-    val tmp: Gen[H] = Gen.oneOf(
-      const(empty),
-      for {
-        v1 <- arbitrary[Int]
-        v2 <- arbitrary[Int]
-        h1 <- insert(v1, empty)
-        h2 <- insert(v2, h1)
-      } yield h2
-    )
+    def loop(h: H, size: Int): Gen[H] = {
+      if (size == 0) h
+      else {
+        for {
+          v <- arbitrary[Int]
+          hg <- loop(insert(v, h), size - 1)
+        } yield hg
+      }
+    }
 
-    tmp
+    val sized: Gen[H] = Gen.sized { size =>
+      loop(empty, size)
+    }
+
+    sized
   }
 
   implicit lazy val arbHeap: Arbitrary[H] = Arbitrary(genHeap)
@@ -37,14 +42,22 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     findMin(h) == a
   }
 
-  property("insert a, b, c into empyt H, findMin = min(a, b, c)") = forAll { (a: Int, b: Int, c: Int) =>
+  property("insert a,b,c into H, findMin = min(a, b, c)") = forAll { (a: Int, b: Int, c: Int) =>
     val h1 = insert(a, empty)
     val h2 = insert(b, h1)
     val h3 = insert(c, h2)
 
-    val min = findMin(h3)
     val expectedMin = math.min(math.min(a, b), c)
+    val expectedMax = math.max(math.max(a, b), c)
+
+    val min = findMin(h3)
     min == expectedMin
+
+    val h4 = deleteMin(h3) // delete the second smallest element
+
+    val h5 = deleteMin(h4) // now this should have the largest element as the only element left.
+
+    findMin(h5) == expectedMax
   }
 
   // If you insert any two elements into an empty heap, finding the minimum of
@@ -62,6 +75,24 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
   property("insert a into empty H, deleteMin == empty H") = forAll { a: Int =>
     val h = insert(a, empty)
     deleteMin(h) == empty
+  }
+
+  // If we insert an element into a heap with a single element, then the new element
+  // should be linked to the existing element, with the smaller one as the root
+  property("insert a into H with a single node") = forAll { (a: Int, b: Int) =>
+
+    val minElement = math.min(a, b)
+    val maxElement = math.max(a, b)
+    val h1 = insert(a, empty) // element a is at the root
+    val h2 = insert(b, h1)
+
+    // we should get the two elements in ascending order
+    val m1 = findMin(h2)
+    val h3 = deleteMin(h2)
+    val m2 = findMin(h3)
+
+    m1 == minElement
+    m2 == maxElement
   }
 
   // Given any heap, you should get a sorted sequence of elements when continually finding

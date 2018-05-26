@@ -16,52 +16,11 @@ object HeapTest {
 
     val h2 = insert(20, h1)
     println(h2)
-    val lh2 =
-      List(
-        Node(20,1,
-          List(
-            Node(60,0,List())
-          )
-        )
-      )
+    val lh2 =  List(Node(20,1,  List(Node(60,0,List()))))
 
     val h3 = insert(100, h2)
     println(h3)
-    val lh3 =
-      List(
-        Node(100,0, List()),
-        Node(20,1,
-          List(
-            Node(60,0,List())
-          )
-        )
-      )
-
-    val h4 = insert(5, h3)
-    println(h4)
-    val lh4 =
-      List(
-        Node(5,2,
-          List(
-            Node(20,1, List(Node(60,0,List()))),
-            Node(100,0,List())
-          )
-        )
-      )
-
-    val h5 = insert(15, h4)
-    println(h5)
-    val lh5 =
-      List(
-        Node(15,0,List()),
-        Node(5,2,
-          List(
-            Node(20,1,List(Node(60,0,List()))),
-            Node(100,0,List())
-          )
-        )
-      )
-
+    val lh3 = List(Node(100,0, List()), Node(20,1, List(Node(60,0,List()))))
 
     // + Heap.insert a into empty H, deleteMin == empty H: OK, passed 100 tests.
     // List(-1, -2147483648)
