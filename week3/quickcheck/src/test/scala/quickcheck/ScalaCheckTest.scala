@@ -103,7 +103,20 @@ object ScalaCheckTest {
       (t1: MyTree[Int], t2: MyTree[Int]) => t1.size + t2.size == t1.merge(t2).size
     }
 
-    propMergeTree.check
+    // propMergeTree.check
+
+    // ----------------
+
+    lazy val genMap: Gen[Map[Int, Int]] = oneOf(
+      const(Map.empty[Int, Int]),
+      for {
+        k <- arbitrary[Int]
+        v <- arbitrary[Int]
+        m <- oneOf(const(Map.empty[Int, Int]), genMap)
+      } yield m.updated(k, v)
+    )
+
+    println(genMap.sample)
 
     // ----------------
   }
