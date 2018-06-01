@@ -23,8 +23,8 @@ class CalculatorTest extends FunSuite {
     val references: Map[String, Signal[Expr]] = Map("h" -> Signal(h))
     val hr = Ref("h")
 
-    val result = Calculator.eval(Times(Literal(2.0), hr), references)
-    println(result)
+    val result: Double = Calculator.eval(Times(Literal(2.0), hr), references)
+    assert(result === -4.0)
   }
 
   test("computeValues") {
@@ -39,7 +39,15 @@ class CalculatorTest extends FunSuite {
       "h" -> Signal(Plus(Ref("g"), Ref("d"))),
       "i" -> Signal(Times(Literal(2.0), Ref("h")))
     )
+
     val result = Calculator.computeValues(namedExpressions)
+
+    assert(result.get("a").map(_()) === Some(2.0))
+    assert(result.get("b").map(_()) === Some(3.0))
+    assert(result.get("c").map(_()) === Some(5.0))
+    assert(result.get("d").map(_()) === Some(-1.0))
+    assert(result.get("e").map(_()) === Some(4.0))
+
     result foreach {
       case (name, signal) => println(s"$name: ${signal()}")
     }
