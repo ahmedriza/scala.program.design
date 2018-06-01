@@ -4,9 +4,6 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
-import scala.collection.immutable
-import scala.collection.immutable.TreeMap
-
 @RunWith(classOf[JUnitRunner])
 class CalculatorTest extends FunSuite {
 
@@ -47,10 +44,9 @@ class CalculatorTest extends FunSuite {
     assert(result.get("c").map(_()) === Some(5.0))
     assert(result.get("d").map(_()) === Some(-1.0))
     assert(result.get("e").map(_()) === Some(4.0))
-
-    result foreach {
-      case (name, signal) => println(s"$name: ${signal()}")
-    }
+    assert(result.get("f").map(_()) === Some(-0.25))
+    assert(result.get("g").map(_()) === Some(-1.0))
+    assert(result.get("h").map(_()) === Some(-2.0))
   }
 
   test("cyclic dependency") {
@@ -61,8 +57,8 @@ class CalculatorTest extends FunSuite {
       "b" -> Signal(Times(Literal(2.0), Ref("a")))
     )
     val result = Calculator.computeValues(namedExpressions)
-    result foreach {
-      case (name, signal) => println(s"$name: ${signal()}")
-    }
+
+    assert(result.get("a").map(_()).map(_.isNaN) === Some(true))
+    assert(result.get("b").map(_()).map(_.isNaN) === Some(true))
   }
 }
